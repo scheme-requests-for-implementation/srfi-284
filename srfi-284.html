@@ -31,6 +31,24 @@ SPDX-License-Identifier: MIT
 
 <h2 id="issues">Issues</h2>
 
+<h2 id="toc">Table of contents</h2>
+<ul>
+  <li><a href="#rationale">Rationale</a></li>
+  <li>
+    <a href="#specification">Specification</a>
+    <ul>
+      <li><a href="#specification-introduction">Introductory Example</a></li>
+      <li><a href="#specification-define-typed">Specification: define-typed</a></li>
+      <li><a href="#specification-define-typed-grammar">Specification: define-typed grammar</a></li>
+      <li><a href="#specification-define-typed-star">Specification: define-typed*</a></li>
+      <li><a href="#specification-lambda-typed-and-lambda-typed*">Specification: lambda-typed and lambda-typed*</a></li>
+    </ul>
+  </li>
+  <li><a href="#implementation">Implementation</a></li>
+  <li><a href="#acknowledgements">Acknowledgements</a></li>
+  <li><a href="#copyright">Copyright</a></li>
+</ul>
+
 <h2 id="rationale">Rationale</h2>
 
     <p>Type boundaries that support documentation make it easier to learn new APIs (<a href="https://pleiad.cl/papers/2014/hanenbergAl-emse2014.pdf">Hanenberg et al 2014</a>) and can enable more code validation at editing-time. This proposal is a simpler version of <a href="https://srfi.schemers.org/srfi-253/srfi-253.html">SRFI 253</a> (though its implementation predates SRFI 253), providing only procedure-level checks. It works well together with the checks for data defined in SRFI 253 and <a href="https://srfi.schemers.org/srfi-273/srfi-273.html">SRFI 273</a>.</p>
