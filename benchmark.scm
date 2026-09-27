@@ -36,17 +36,17 @@ exec guile -L . "$0"
 
 (define-typed
   (magnitude-typed/return-multiple x y)
-  ((float? float?) float? float?)
+  ((-> float? float?) float? float?)
   (values 1.0 (sqrt (+ (* x x) (* y y)))))
 
 (define-typed
   (magnitude-typed/return-proc x y)
-  ((all-float?) float? float?)
+  ((-> all-float?) float? float?)
   (values 1.0 (sqrt (+ (* x x) (* y y)))))
 
 (define-typed
   (magnitude-typed/return-lambda x y)
-  (((λ (vals) (apply > vals))) number? number?)
+  ((-> (λ (vals) (apply > vals))) number? number?)
   (values (sqrt (+ (* x x) (* y y))) x))
 
 (define-typed
@@ -100,23 +100,43 @@ exec guile -L . "$0"
   (sqrt (+ (* x x) (* y y))))
 
 (define-typed*
+  (magnitude-typed*/return-keyword-with-default x y #:key (foo #t))
+  (float? float? float? #:key identity)
+  (sqrt (+ (* x x) (* y y))))
+
+(define-typed*
+  (magnitude-typed*/return-rest x y #:rest r)
+  (float? float? float? #:rest null?)
+  (sqrt (+ (* x x) (* y y))))
+
+(define-typed*
   (magnitude-typed*/return x y #:key foo)
   (float? float? float? #:key not)
   (sqrt (+ (* x x) (* y y))))
 
 (define-typed*
   (magnitude-typed*/return-multiple x y #:key foo)
-  ((float? float?) float? float? #:key not)
+  ((-> float? float?) float? float? #:key not)
   (values 1.0 (sqrt (+ (* x x) (* y y)))))
 
 (define-typed*
   (magnitude-typed*/return-proc x y #:key foo)
-  ((all-float?) float? float? #:key not)
+  ((-> all-float?) float? float? #:key not)
   (values 1.0 (sqrt (+ (* x x) (* y y)))))
 
 (define-typed*
   (magnitude-typed*/return-> x y #:key foo)
   (float? float? #:key not -> float?)
+  (sqrt (+ (* x x) (* y y))))
+
+(define-typed*
+  (magnitude-typed*/return->keyword-with-default x y #:key (foo #t))
+  (float? float? #:key identity -> float?)
+  (sqrt (+ (* x x) (* y y))))
+
+(define-typed*
+  (magnitude-typed*/return->rest x y #:rest r)
+  (float? float? #:rest null? -> float?)
   (sqrt (+ (* x x) (* y y))))
 
 (define-typed*
@@ -161,8 +181,12 @@ exec guile -L . "$0"
     magnitude-typed*/no-return-check
     magnitude-typed*/no-return-check-by-missing-type
     magnitude-typed*/return
+    magnitude-typed*/return-keyword-with-default
+    magnitude-typed*/return-rest
     magnitude-typed*/return-multiple
     magnitude-typed*/return-proc
     magnitude-typed*/return->
+    magnitude-typed*/return->keyword-with-default
+    magnitude-typed*/return->rest
     magnitude-typed*/return-multiple->
     magnitude-typed*/return-proc->))

@@ -64,7 +64,7 @@ SPDX-License-Identifier: MIT
 
     <p>There are three ways to call <code>define-typed</code>: only <em>argument types</em>, only <em>return type</em>, and <em>argument types</em> and <em>return types</em>.</p>
 
-    <p>Each <em>type</em> can be a predicate-procedure, a lambda form, or <code>#f</code> (for “no type check”).</p>
+    <p>Each <em>type</em> can be a predicate-procedure, a lambda form or another form that evaluates to a predicate, or <code>#f</code> (for “no type check”).</p>
 
     <p>The <em>argument types</em> must contain one <em>type</em> (as described above) per argument.</p>
 
@@ -113,16 +113,44 @@ SPDX-License-Identifier: MIT
 ;;     (prop val))
     </code></pre>
 
+    <h3 id="specification-define-typed-grammar">Specification: <code>define-typed</code> grammar</h3>
+
+    <p>An informal grammar, following <a href="https://standards.scheme.org/r7rs-html5/index.html">the R7RS definitions</a>:</p>
+    
+    <pre><code>
+&lt;define-typed> = (define-typed (&lt;name> &lt;arg> ...) &lt;types> &lt;body>)
+&lt;arg> = symbol
+&lt;name> = symbol
+&lt;types> = (&lt;argtype> ... -> &lt;rettype>)       ; 1: args with a single return type
+        | (&lt;argtype> ... (-> &lt;retlisttype>)) ; 2: args with multiple returns,
+                                             ;    checked with a single
+                                             ;    procedure that receives the
+                                             ;    return values as list
+        | (&lt;argtype> ... (-> &lt;rettype> &lt;rettype> &lt;rettype> ...)) ; 3: args with multiple returns
+        | (&lt;argtype> ...)                    ; 4: args only
+&lt;artype> = #f | symbol | &lt;predicate-form>
+&lt;rettype> = #f | symbol | &lt;predicate-form>
+&lt;retlisttype> = &lt;predicate-form> that receives a list with all return values
+&lt;predicate-form> = a form evaluating to a procedure with one argument that returns a true value or #f
+&lt;body> = as per R7RS section 4.1.4
+</code></pre>
+    
     <h3 id="specification-define-typed-star">Specification: <code>define-typed*</code></h3>
 
-    <p>The form <code>define-typed*</code> works like the form <code>define-typed</code>, but it supports named and optional and rest arguments in the style provided by the implementation. The named and optional and rest arguments are typed using the same representation in which they are defined.</p>
+    <p>The form <code>define-typed*</code> works like the form <code>define-typed</code>, but it should support named and optional argument and must support rest arguments in the style provided by the implementation. The named and optional and rest arguments are typed using the same representation in which they are defined.</p>
 
     <p>This form does not yield portable code, because named and optional argument representation differ between implementations, but it provides a portable structure for named and optional arguments, using their implementation-specific representation.</p>
-    <p>Example for Guile:</p>
 
-<pre><code>
-(define-typed* (foo x #:key bar) (float? #:key float? -> float?)
+    <p>Support for rest arguments is required (must) while named (keyword) and optional arguments are optional (should), because support for rest arguments is necessary to enable all possibilities of regular <code>define</code> and <code>labmda</code>.</p>
+    <p>Examples for Guile:</p>
+
+    <pre><code>
+(import (only (srfi :1) every))
+(define-typed* (foo x #:key bar) (number? #:key number? -> number?)
   x)
+(define (all-number? x) (every identity (map number? x)))
+(define-typed* (foo x #:rest r) (number? #:rest all-number? -> all-number?)
+  r)
 </code></pre>
 
     <h3 id="specification-lambda-typed-and-lambda-typed*">Specification: <code>lambda-typed</code> and <code>lambda-typed*</code></h3>
@@ -135,7 +163,7 @@ SPDX-License-Identifier: MIT
 
 <h2 id="acknowledgements">Acknowledgements</h2>
 
-<p>That this implementation became a SRFI is thanks to the work of Artyom Bologov in <a href="https://srfi.schemers.org/srfi-253/srfi-253.html">SRFI 253</a> and <a href="https://srfi.schemers.org/srfi-283/srfi-283.html">SRFI 283</a>. That it exists at all is thanks to both the work of sph on <a href="https://github.com/sph-mn/sph-sc">sph-sc</a> and <a href="https://sph.mn/computer/guides/c/c-indent.html">c-indent</a> for the initial form of <code>define-typed</code> and the article <a href="https://dthompson.us/posts/optimizing-guile-scheme.html">Optimizing Guile Scheme</a> by David Thompson. Without these, I would likely never have started on the path that led here.</p>
+<p>That this implementation became a SRFI is thanks to the work of Artyom Bologov in <a href="https://srfi.schemers.org/srfi-253/srfi-253.html">SRFI 253</a> and <a href="https://srfi.schemers.org/srfi-283/srfi-283.html">SRFI 283</a>. Artyom also contributed significant reviews and the first version of the informal grammar to this SRFI. That it exists at all is thanks to both the work of sph on <a href="https://github.com/sph-mn/sph-sc">sph-sc</a> and <a href="https://sph.mn/computer/guides/c/c-indent.html">c-indent</a> for the initial form of <code>define-typed</code> and the article <a href="https://dthompson.us/posts/optimizing-guile-scheme.html">Optimizing Guile Scheme</a> by David Thompson. Without these, I would likely never have started on the path that led here.</p>
 
 <h2 id="copyright">Copyright</h2>
 <p>© 2026 Arne Babenhauserheide.</p>

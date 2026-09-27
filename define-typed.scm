@@ -234,7 +234,7 @@
         (types ... (-> ret?))
         body ...)
      (define-typed (procname args ...)
-       ((ret?) types ...)
+       ((-> ret?) types ...)
         body ...))
     ;; two or more return checkers: one per value (fixed number of
     ;; return values!)
@@ -242,7 +242,7 @@
         (types ... (-> ret1? ret2* ret*? ...))
         body ...)
      (define-typed (procname args ...)
-       ((ret1? ret2* ret*? ...) types ...)
+       ((-> ret1? ret2* ret*? ...) types ...)
        body ...))
     ;; alternate single return value syntax with -> ret
     ((_ (procname args ...)
@@ -255,7 +255,7 @@
        body ...))
     ;; single checker: check all returned values via procedure
     ((_ (procname args ...)
-        ((ret?) types ...)
+        ((-> ret?) types ...)
         body ...)
      (define-typed/helper procname (args ...)
        (types ...)
@@ -265,15 +265,13 @@
     ;; two or more return checkers: one per value (fixed number of
     ;; return values!)
     ((_ (procname args ...)
-        ((ret1? ret2* ret*? ...) types ...)
+        ((-> ret1? ret2* ret*? ...) types ...)
         body ...)
-     (begin
-       (define return-checkers (list ret1? ret2* ret*? ...))
-       (define-typed/helper procname (args ...)
-         (types ...)
-         call-and-check-return-type/multiple
-         return-checkers
-         body ...)))
+     (define-typed/helper procname (args ...)
+       (types ...)
+       call-and-check-return-type/multiple
+       (list ret1? ret2* ret*? ...) ;; return-checkers
+       body ...))
     ;; alternate single return syntax with -> ret
     ((_ (procname args ...)
         (types ... -> ret?)
@@ -303,9 +301,9 @@
   (syntax-rules ()
     ((_ (#f types? ...) (argument arguments ...)) ;; no type check for argument
      (check-types* (types? ...) (arguments ...)))
-    ;; TODO add special handling for keyword arguments used out of
-    ;; order. This may need to use let-optional and let-keywords from
-    ;; (ice-9 optargs).
+    ;; special handling for keyword arguments with default value.
+    ((_ (type? types? ...) ((keyword-name default) arguments ...))
+     (check-types* (type? types? ...) (keyword-name arguments ...)))
     ((_ (type? types? ...) (argument arguments ...))
      (begin
        (if (and (keyword? type?)
@@ -337,13 +335,15 @@
     ;; single -> checker: check all returned values via procedure
     ((_ (procname args ...) (types ... (-> ret?))
         body ...)
-     (define-typed* (procname args ...) ((ret?) types ...)
+     (define-typed* (procname args ...)
+       ((-> ret?) types ...)
         body ...))
     ;; two or more return checkers: one per value (fixed number of
     ;; return values!)
     ((_ (procname args ...) (types ... (-> ret1? ret2* ret*? ...))
         body ...)
-     (define-typed* (procname args ...) ((ret1? ret2* ret*? ...) types ...)
+     (define-typed* (procname args ...)
+       ((-> ret1? ret2* ret*? ...) types ...)
        body ...))
     ;; alternate single return value syntax with -> ret
     ((_ (procname args ...) (types ... -> ret?)
@@ -353,7 +353,8 @@
        ret?
        body ...))
     ;; single checker: check all returned values via procedure
-    ((_ (procname args ...) ((ret?) types ...)
+    ((_ (procname args ...)
+        ((-> ret?) types ...)
         body ...)
      (define-typed*/helper procname (args ...) (types ...)
        call-and-check-return-type/proc
@@ -361,14 +362,14 @@
        body ...))
     ;; two or more return checkers: one per value (fixed number of
     ;; return values!)
-    ((_ (procname args ...) ((ret1? ret2* ret*? ...) types ...)
+    ((_ (procname args ...)
+        ((-> ret1? ret2* ret*? ...) types ...)
         body ...)
-     (begin
-       (define return-checkers (list ret1? ret2* ret*? ...))
-       (define-typed*/helper procname (args ...) (types ...)
-         call-and-check-return-type/multiple
-         return-checkers
-         body ...)))
+     (define-typed*/helper procname (args ...)
+       (types ...)
+       call-and-check-return-type/multiple
+       (list ret1? ret2* ret*? ...) ;; return-checkers
+       body ...))
     ;; single return checker: only check one value, further values are
     ;; discarded except if ret? is #f: then do not check, keep all
     ;; values
