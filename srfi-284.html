@@ -134,7 +134,7 @@ SPDX-License-Identifier: MIT
     <h3 id="specification-define-typed-grammar">Specification: <code>define-typed</code> grammar</h3>
 
     <p>An informal grammar, following <a href="https://standards.scheme.org/r7rs-html5/index.html">the R7RS definitions</a>:</p>
-    
+
     <pre><code>
 &lt;define-typed> = (define-typed (&lt;name> &lt;arg> ...) &lt;types> &lt;body>)
 &lt;arg> = symbol
@@ -152,7 +152,7 @@ SPDX-License-Identifier: MIT
 &lt;predicate-form> = a form evaluating to a procedure with one argument that returns a true value or #f
 &lt;body> = as per R7RS section 4.1.4
 </code></pre>
-    
+
     <h3 id="specification-define-typed-star">Specification: <code>define-typed*</code></h3>
 
     <p>The form <code>define-typed*</code> works like the form <code>define-typed</code>, but it should support named and optional argument and must support rest arguments in the style provided by the implementation. The named and optional and rest arguments are typed using the same representation in which they are defined.</p>
