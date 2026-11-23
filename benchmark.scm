@@ -248,12 +248,12 @@ exec guile -L . "$0"
     magnitude-typed/no-return-check
     magnitude-typed/return
     ;; rest argument examples
-    magnitude-typed/rest-each
-    magnitude-typed/rest-one-for-all
-    magnitude-typed/rest-two-alternating
     magnitude-typed/rest-each-no-return
     magnitude-typed/rest-one-for-all-no-return
     magnitude-typed/rest-two-alternating-no-return
+    magnitude-typed/rest-each
+    magnitude-typed/rest-one-for-all
+    magnitude-typed/rest-two-alternating
     magnitude-typed/rest-each-untyped-arg-no-return
     magnitude-typed/rest-each-only-no-return
     magnitude-typed/rest-one-for-all-only-no-return
